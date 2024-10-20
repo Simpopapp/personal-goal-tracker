@@ -14,7 +14,20 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Challenge } from '../types';
+
+interface Challenge {
+  id: string;
+  name: string;
+  currentProgress: number;
+  target: number;
+  description?: string;
+  metricType: "hours" | "times" | "days";
+}
+
+type ChallengeFormProps = {
+  onSubmit: (data: Omit<Challenge, 'id' | 'currentProgress'>) => void;
+  onCancel: () => void;
+};
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -28,11 +41,6 @@ const formSchema = z.object({
     message: 'A meta deve ser pelo menos 1.',
   }),
 });
-
-type ChallengeFormProps = {
-  onSubmit: (data: Omit<Challenge, 'id' | 'currentProgress'>) => void;
-  onCancel: () => void;
-};
 
 const ChallengeForm: React.FC<ChallengeFormProps> = ({ onSubmit, onCancel }) => {
   const form = useForm<z.infer<typeof formSchema>>({
