@@ -8,6 +8,12 @@ import { toast } from 'sonner';
 import ChallengeForm from './ChallengeForm';
 import { fetchChallenges, addChallenge, updateProgress } from '../utils/api';
 import { Challenge } from '../types';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 const Dashboard = () => {
   const queryClient = useQueryClient();
@@ -35,7 +41,7 @@ const Dashboard = () => {
     },
   });
 
-  const handleAddChallenge = (challenge: Omit<Challenge, 'id'>) => {
+  const handleAddChallenge = (challenge: Omit<Challenge, 'id' | 'currentProgress'>) => {
     addChallengeMutation.mutate(challenge);
   };
 
@@ -63,6 +69,18 @@ const Dashboard = () => {
               <p className="text-sm font-medium">
                 {challenge.currentProgress} de {challenge.target} {challenge.metricType}
               </p>
+              <ChartContainer className="mt-4 h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={[{ name: 'Progresso', value: challenge.currentProgress }]}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Bar dataKey="value" fill="#8884d8" />
+                    <ChartTooltip>
+                      <ChartTooltipContent />
+                    </ChartTooltip>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
               <Button
                 variant="outline"
                 size="sm"
