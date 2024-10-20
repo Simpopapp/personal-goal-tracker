@@ -69,14 +69,14 @@ const Dashboard = () => {
               <p className="text-sm font-medium">
                 {challenge.currentProgress} de {challenge.target} {challenge.metricType}
               </p>
-              <ChartContainer className="mt-4 h-[200px]">
+              <ChartContainer className="mt-4 h-[200px]" config={{}}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={[{ name: 'Progresso', value: challenge.currentProgress }]}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Bar dataKey="value" fill="#8884d8" />
                     <ChartTooltip>
-                      <ChartTooltipContent />
+                      {(props) => <ChartTooltipContent {...props} />}
                     </ChartTooltip>
                   </BarChart>
                 </ResponsiveContainer>
