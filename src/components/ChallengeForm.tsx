@@ -54,7 +54,12 @@ const ChallengeForm: React.FC<ChallengeFormProps> = ({ onSubmit, onCancel }) => 
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
+    onSubmit({
+      name: values.name,
+      description: values.description,
+      metricType: values.metricType,
+      target: values.target,
+    });
   };
 
   return (
