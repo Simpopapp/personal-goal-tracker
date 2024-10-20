@@ -59,3 +59,12 @@ export const updateProgress = ({ id, progress }: { id: number; progress: number 
   challenge.progressData.push({ date: today, progress: challenge.currentProgress });
   return Promise.resolve(challenge);
 };
+
+export const deleteChallenge = (id: number): Promise<void> => {
+  const index = challenges.findIndex(c => c.id === id);
+  if (index === -1) {
+    return Promise.reject(new Error('Challenge not found'));
+  }
+  challenges.splice(index, 1);
+  return Promise.resolve();
+};

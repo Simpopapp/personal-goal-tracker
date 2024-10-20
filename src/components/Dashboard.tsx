@@ -1,12 +1,23 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import ChallengeForm from './ChallengeForm';
-import { fetchChallenges, addChallenge, updateProgress } from '../utils/api';
+import { fetchChallenges, addChallenge, updateProgress, deleteChallenge } from '../utils/api';
 import { ChallengeWithProgress } from '../types';
 import TopBottomChart from './TopBottomChart';
 
@@ -36,12 +47,24 @@ const Dashboard = () => {
     },
   });
 
+  const deleteChallengesMutation = useMutation({
+    mutationFn: deleteChallenge,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['challenges'] });
+      toast.success('Desafio excluído com sucesso!');
+    },
+  });
+
   const handleAddChallenge = (challenge: Omit<ChallengeWithProgress, 'id' | 'currentProgress' | 'progressData'>) => {
     addChallengeMutation.mutate(challenge);
   };
 
   const handleQuickProgress = (id: number) => {
     updateProgressMutation.mutate({ id, progress: 1 });
+  };
+
+  const handleDeleteChallenge = (id: number) => {
+    deleteChallengesMutation.mutate(id);
   };
 
   return (
@@ -55,8 +78,29 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {challenges.map((challenge) => (
           <Card key={challenge.id} className="flex flex-col">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{challenge.name}</CardTitle>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação não pode ser desfeita. Isso excluirá permanentemente o desafio e todos os dados associados.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDeleteChallenge(challenge.id)}>
+                      Sim, excluir desafio
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardHeader>
             <CardContent className="flex-grow">
               <p className="text-sm text-gray-500 mb-2">{challenge.description}</p>
