@@ -13,3 +13,12 @@ export type Challenge = {
   target: number;
   currentProgress: number;
 };
+
+export interface ProgressDataPoint {
+  date: string;
+  progress: number;
+}
+
+export interface ChallengeWithProgress extends Challenge {
+  progressData: ProgressDataPoint[];
+}

@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import ChallengeForm from './ChallengeForm';
-import { fetchChallenges, addChallenge, updateProgress, fetchChartData } from '../utils/api';
-import { Challenge } from '../types';
+import { fetchChallenges, addChallenge, updateProgress } from '../utils/api';
+import { ChallengeWithProgress } from '../types';
 import TopBottomChart from './TopBottomChart';
 
 const Dashboard = () => {
@@ -17,11 +17,6 @@ const Dashboard = () => {
   const { data: challenges = [] } = useQuery({
     queryKey: ['challenges'],
     queryFn: fetchChallenges,
-  });
-
-  const { data: chartData = [] } = useQuery({
-    queryKey: ['chartData'],
-    queryFn: fetchChartData,
   });
 
   const addChallengeMutation = useMutation({
@@ -41,7 +36,7 @@ const Dashboard = () => {
     },
   });
 
-  const handleAddChallenge = (challenge: Omit<Challenge, 'id' | 'currentProgress'>) => {
+  const handleAddChallenge = (challenge: Omit<ChallengeWithProgress, 'id' | 'currentProgress' | 'progressData'>) => {
     addChallengeMutation.mutate(challenge);
   };
 
@@ -57,13 +52,13 @@ const Dashboard = () => {
           <PlusCircle className="mr-2 h-4 w-4" /> Novo Desafio
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {challenges.map((challenge) => (
-          <Card key={challenge.id}>
+          <Card key={challenge.id} className="flex flex-col">
             <CardHeader>
               <CardTitle>{challenge.name}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
               <p className="text-sm text-gray-500 mb-2">{challenge.description}</p>
               <Progress value={(challenge.currentProgress / challenge.target) * 100} className="mb-2" />
               <p className="text-sm font-medium">
@@ -77,6 +72,9 @@ const Dashboard = () => {
               >
                 <PlusCircle className="mr-2 h-4 w-4" /> Registrar Progresso
               </Button>
+              <div className="mt-4">
+                <TopBottomChart data={challenge.progressData} target={challenge.target} />
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -84,14 +82,6 @@ const Dashboard = () => {
       {isFormOpen && (
         <ChallengeForm onSubmit={handleAddChallenge} onCancel={() => setIsFormOpen(false)} />
       )}
-      <Card>
-        <CardHeader>
-          <CardTitle>Análise de Topos e Fundos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TopBottomChart data={chartData} />
-        </CardContent>
-      </Card>
     </div>
   );
 };
