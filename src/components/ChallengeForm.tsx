@@ -30,7 +30,7 @@ const formSchema = z.object({
 });
 
 type ChallengeFormProps = {
-  onSubmit: (data: Omit<Challenge, 'id'>) => void;
+  onSubmit: (data: Omit<Challenge, 'id' | 'currentProgress'>) => void;
   onCancel: () => void;
 };
 
@@ -46,7 +46,7 @@ const ChallengeForm: React.FC<ChallengeFormProps> = ({ onSubmit, onCancel }) => 
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit({ ...values, currentProgress: 0 });
+    onSubmit(values);
   };
 
   return (
